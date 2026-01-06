@@ -50,9 +50,9 @@ def discover(input_text, service):
                 click.echo(f"  Service: {discover_result.outputs.get('service_name', 'N/A')}")
                 click.echo(f"  Problem: {discover_result.outputs.get('problem', {}).get('statement', 'N/A')}")
                 click.echo(f"  Maturity: {discover_result.outputs.get('maturity_assessment', {}).get('level', 'N/A')}")
-                click.echo("\n✓ Discovery complete")
+                click.echo("\n[OK] Discovery complete")
         else:
-            click.echo(f"\n✗ Discovery failed: {result.errors}", err=True)
+            click.echo(f"\n[ERROR] Discovery failed: {result.errors}", err=True)
             sys.exit(1)
     
     asyncio.run(run_discover())
@@ -103,10 +103,10 @@ def run(input_text, activities, service):
         )
         
         if result.success:
-            click.echo(f"\n✓ Orchestration complete")
+            click.echo(f"\n[OK] Orchestration complete")
             click.echo(f"  Activities executed: {', '.join(result.activities_executed)}")
         else:
-            click.echo(f"\n✗ Orchestration failed: {result.errors}", err=True)
+            click.echo(f"\n[ERROR] Orchestration failed: {result.errors}", err=True)
             sys.exit(1)
     
     asyncio.run(run_orchestrator())
