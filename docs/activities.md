@@ -20,7 +20,7 @@ Activities are AI agents that use LLM to make autonomous decisions. Each activit
 ```python
 from orchestrator.activity import Activity
 
-class MyActivity(Activity):
+class Discover(Activity):
     async def execute(self, context: ActivityContext) -> ActivityResult:
         # Load context (specification, manifest, tools, history)
         # Format prompt with context

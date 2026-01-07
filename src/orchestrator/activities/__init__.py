@@ -2,7 +2,7 @@
 Activities package
 """
 
-from .discover import DiscoverActivity
+from .discover import Discover
 
-__all__ = ["DiscoverActivity"]
+__all__ = ["Discover"]
 

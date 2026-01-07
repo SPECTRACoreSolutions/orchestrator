@@ -32,6 +32,32 @@ class ContextBuilder:
             workspace_root: SPECTRA workspace root directory. If None, auto-detects.
         """
         self.workspace_root = workspace_root or self._find_workspace_root()
+        self._orchestrator_dir = self._find_orchestrator_dir()
+    
+    def _find_orchestrator_dir(self) -> Optional[Path]:
+        """
+        Find orchestrator repository directory.
+        
+        Returns:
+            Path to Core/orchestrator/ if found, None otherwise
+        """
+        orchestrator_path = self.workspace_root / "Core" / "orchestrator"
+        if orchestrator_path.exists():
+            return orchestrator_path
+        return None
+    
+    @property
+    def orchestrator_state_dir(self) -> Path:
+        """
+        Get directory for orchestrator internal state.
+        
+        Returns:
+            Path to .orchestrator/ directory in orchestrator repo
+        """
+        if self._orchestrator_dir:
+            return self._orchestrator_dir / ".orchestrator"
+        # Fallback to workspace root if orchestrator not found
+        return self.workspace_root / ".spectra" / "orchestrator"
 
     def _find_workspace_root(self) -> Path:
         """
@@ -49,13 +75,7 @@ class ContextBuilder:
         """
         current = Path.cwd()
 
-        # Strategy 1: Check for .spectra marker
-        for check_path in [current] + list(current.parents):
-            if (check_path / ".spectra").exists():
-                logger.debug(f"Found workspace root via .spectra marker: {check_path}")
-                return check_path
-
-        # Strategy 2: Check for Core/ directory (assuming we're in Core/orchestrator)
+        # Strategy 1: Check for Core/ directory (primary method - more reliable)
         for check_path in [current] + list(current.parents):
             if (check_path / "Core").exists() and check_path.name != "Core":
                 logger.debug(f"Found workspace root via Core/ directory: {check_path}")
@@ -66,11 +86,19 @@ class ContextBuilder:
                 logger.debug(f"Found workspace root (parent of Core): {workspace_root}")
                 return workspace_root
 
+        # Strategy 2: Fallback to .spectra marker (for solution-engine compatibility)
+        for check_path in [current] + list(current.parents):
+            if (check_path / ".spectra").exists():
+                logger.debug(f"Found workspace root via .spectra marker (fallback): {check_path}")
+                return check_path
+
         raise ValueError("Could not find SPECTRA workspace root")
 
     def load_specification(self, service_name: str) -> Optional[Specification]:
         """
         Load specification for a service.
+        
+        SPECTRA-Grade: Specifications are stored in service directories following Service Blueprint.
         
         Args:
             service_name: Service name
@@ -78,22 +106,19 @@ class ContextBuilder:
         Returns:
             Specification object, or None if not found
         """
-        # Try .spectra/ directory first
-        spectra_dir = self.workspace_root / ".spectra"
-        spec_path = spectra_dir / f"{service_name}.specification.yaml"
-        if spec_path.exists():
-            logger.debug(f"Loading specification from: {spec_path}")
-            return Specification.load(spec_path)
-
-        # Try service directory (e.g., Core/{service_name}/{service_name}.specification.yaml)
-        service_paths = [
-            self.workspace_root / "Core" / service_name / f"{service_name}.specification.yaml",
-            self.workspace_root / service_name / f"{service_name}.specification.yaml",
-        ]
-        for spec_path in service_paths:
+        # Try service directories first (SPECTRA-Grade location)
+        for org_folder in ["Core", "Data", "Design", "Engagement", "Engineering", "Media", "Security"]:
+            spec_path = self.workspace_root / org_folder / service_name / f"{service_name}.specification.yaml"
             if spec_path.exists():
                 logger.debug(f"Loading specification from: {spec_path}")
                 return Specification.load(spec_path)
+
+        # Fallback to .spectra/ (legacy solution-engine location)
+        spectra_dir = self.workspace_root / ".spectra" / "specifications"
+        spec_path = spectra_dir / f"{service_name}-specification.yaml"
+        if spec_path.exists():
+            logger.debug(f"Loading specification from legacy location: {spec_path}")
+            return Specification.load(spec_path)
 
         logger.warning(f"Specification not found for service: {service_name}")
         return None
@@ -102,6 +127,8 @@ class ContextBuilder:
         """
         Load manifest for an activity.
         
+        SPECTRA-Grade: Manifests are stored in orchestrator repo, not workspace root.
+        
         Args:
             service_name: Service name
             activity_name: Activity name (e.g., "discover")
@@ -109,22 +136,18 @@ class ContextBuilder:
         Returns:
             Manifest object, or None if not found
         """
-        # Try .spectra/manifests/ directory
-        manifests_dir = self.workspace_root / ".spectra" / "manifests"
+        # Orchestrator state stored in orchestrator repo
+        manifests_dir = self.orchestrator_state_dir / "manifests"
         manifest_path = manifests_dir / f"{activity_name}-manifest.yaml"
         if manifest_path.exists():
-            logger.debug(f"Loading manifest from: {manifest_path}")
+            logger.debug(f"Loading manifest from orchestrator state: {manifest_path}")
             return Manifest.load(manifest_path)
 
-        # Try service-specific manifest
-        service_paths = [
-            self.workspace_root / ".spectra" / service_name / f"{activity_name}-manifest.yaml",
-            self.workspace_root / "Core" / service_name / f"{activity_name}-manifest.yaml",
-        ]
-        for manifest_path in service_paths:
-            if manifest_path.exists():
-                logger.debug(f"Loading manifest from: {manifest_path}")
-                return Manifest.load(manifest_path)
+        # Fallback to .spectra/ (legacy solution-engine location)
+        legacy_path = self.workspace_root / ".spectra" / "manifests" / f"{activity_name}-manifest.yaml"
+        if legacy_path.exists():
+            logger.debug(f"Loading manifest from legacy location: {legacy_path}")
+            return Manifest.load(legacy_path)
 
         logger.debug(f"Manifest not found for {activity_name}, will create new one")
         return None
@@ -148,17 +171,70 @@ class ContextBuilder:
         """
         Load activity history for self-learning.
         
+        SPECTRA-Grade: History stored in orchestrator repo, not workspace root.
+        
         Args:
             activity_name: Activity name
             
         Returns:
             ActivityHistory object (empty if not found)
         """
-        history_dir = self.workspace_root / ".spectra" / "history"
+        # Orchestrator state stored in orchestrator repo
+        history_dir = self.orchestrator_state_dir / "history"
         history_path = history_dir / f"{activity_name}-history.yaml"
         
-        logger.debug(f"Loading history from: {history_path}")
+        logger.debug(f"Loading history from orchestrator state: {history_path}")
         return ActivityHistory.load(history_path)
+
+    def summarize_specification(self, specification: Optional[Specification]) -> Optional[str]:
+        """
+        Summarize specification to reduce prompt size.
+        
+        Args:
+            specification: Specification object
+            
+        Returns:
+            Summarized specification string, or None
+        """
+        if not specification:
+            return None
+        
+        spec_dict = specification.to_dict()
+        summary_parts = []
+        
+        if spec_dict.get("service"):
+            summary_parts.append(f"Service: {spec_dict['service']}")
+        if spec_dict.get("purpose"):
+            summary_parts.append(f"Purpose: {spec_dict['purpose'][:200]}...")
+        if spec_dict.get("maturity"):
+            summary_parts.append(f"Maturity: {spec_dict['maturity']}")
+        
+        return "\n".join(summary_parts) if summary_parts else None
+
+    def summarize_manifest(self, manifest: Optional[Manifest]) -> Optional[str]:
+        """
+        Summarize manifest to reduce prompt size.
+        
+        Args:
+            manifest: Manifest object
+            
+        Returns:
+            Summarized manifest string, or None
+        """
+        if not manifest:
+            return None
+        
+        manifest_dict = manifest.to_dict()
+        summary_parts = []
+        
+        if manifest_dict.get("status"):
+            summary_parts.append(f"Status: {manifest_dict['status']}")
+        if manifest_dict.get("outputs"):
+            outputs = manifest_dict["outputs"]
+            output_keys = list(outputs.keys())[:5]  # First 5 keys only
+            summary_parts.append(f"Outputs: {', '.join(output_keys)}")
+        
+        return "\n".join(summary_parts) if summary_parts else None
 
     def build_activity_context(
         self,
@@ -195,12 +271,13 @@ class ContextBuilder:
         if history is None:
             history = self.load_history(activity_name)
 
+        # Summarize instead of full dump to reduce prompt size
         context = {
             "activity": activity_name,
-            "specification": specification.to_dict() if specification else None,
-            "manifest": manifest.to_dict() if manifest else None,
-            "tools": tools,
-            "history": [entry.__dict__ for entry in history.get_recent(10)] if history else [],
+            "specification_summary": self.summarize_specification(specification),
+            "manifest_summary": self.summarize_manifest(manifest),
+            "tools": tools[:10] if tools else [],  # Limit to 10 tools
+            "history_count": len(history.get_recent(10)) if history else 0,
         }
 
         return context

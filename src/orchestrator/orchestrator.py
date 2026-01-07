@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from .activity import Activity, ActivityContext, ActivityResult
-from .activities.discover import DiscoverActivity
+from .activities.discover import Discover
 from .context import ContextBuilder
 from .llm_client import LLMClient
 from .playbooks import PlaybookRegistry

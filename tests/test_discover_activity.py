@@ -3,22 +3,22 @@ Tests for Discover Activity
 """
 
 import pytest
-from orchestrator.activities.discover import DiscoverActivity
+from orchestrator.activities.discover import Discover
 from orchestrator.activity import ActivityContext, ActivityResult
 
 
 @pytest.mark.asyncio
-async def test_discover_activity_initialization():
-    """Test DiscoverActivity initialization."""
-    activity = DiscoverActivity()
+async def test_discover_initialization():
+    """Test Discover initialization."""
+    activity = Discover()
     assert activity.name == "discover"
     await activity.llm_client.close()
 
 
 @pytest.mark.asyncio
-async def test_discover_activity_execute_mock(monkeypatch):
-    """Test DiscoverActivity execution with mocked LLM."""
-    activity = DiscoverActivity()
+async def test_discover_execute_mock(monkeypatch):
+    """Test Discover execution with mocked LLM."""
+    activity = Discover()
     
     # Mock LLM client
     async def mock_chat_completion(system_prompt, user_message):

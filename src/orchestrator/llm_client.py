@@ -45,7 +45,7 @@ class LLMClient:
         self.model = model or os.getenv(
             "ORCHESTRATOR_LLM_MODEL", "mistralai/Mistral-7B-Instruct-v0.3"
         )
-        self.client = httpx.AsyncClient(timeout=120.0)
+        self.client = httpx.AsyncClient(timeout=600.0)  # 10 minutes for comprehensive discovery (matches API gateway)
 
     async def chat_completion(
         self,
@@ -92,7 +92,17 @@ class LLMClient:
 
         try:
             response = await self.client.post(self.api_url, json=payload, headers=headers)
-            response.raise_for_status()
+            
+            if response.status_code != 200:
+                error_text = response.text
+                logger.error(f"LLM API request failed: {response.status_code} - {error_text[:500]}")
+                try:
+                    error_json = response.json()
+                    logger.error(f"Error details: {error_json}")
+                except:
+                    pass
+                response.raise_for_status()
+            
             data = response.json()
             content = data["choices"][0]["message"]["content"]
             
@@ -103,6 +113,12 @@ class LLMClient:
             )
             
             return content
+        except httpx.HTTPStatusError as e:
+            logger.error(f"LLM API request failed: {e}")
+            if e.response:
+                logger.error(f"Response status: {e.response.status_code}")
+                logger.error(f"Response body: {e.response.text[:500]}")
+            raise
         except httpx.HTTPError as e:
             logger.error(f"LLM API request failed: {e}")
             raise
