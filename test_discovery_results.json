@@ -1,0 +1,163 @@
+{
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "service_name_matches": 4,
+    "maturity_matches": 0
+  },
+  "results": {
+    "portal": {
+      "success": true,
+      "discovery": {
+        "service_name": "portal",
+        "problem": {},
+        "idea": {},
+        "validation": {},
+        "maturity_assessment": {},
+        "next_steps": ""
+      },
+      "comparison": {
+        "service_name": {
+          "discovered": "portal",
+          "actual": "portal",
+          "match": true
+        },
+        "problem": {
+          "discovered": "",
+          "actual": "Not specified in covenant",
+          "match": null
+        },
+        "purpose": {
+          "discovered": "",
+          "actual": "Not specified",
+          "match": null
+        },
+        "maturity": {
+          "discovered": "",
+          "actual": "Not specified",
+          "match": null
+        },
+        "validation": {
+          "discovered": null,
+          "actual": "N/A",
+          "match": null
+        }
+      }
+    },
+    "email": {
+      "success": true,
+      "discovery": {
+        "service_name": "email",
+        "problem": {},
+        "idea": {},
+        "validation": {},
+        "maturity_assessment": {},
+        "next_steps": ""
+      },
+      "comparison": {
+        "service_name": {
+          "discovered": "email",
+          "actual": "email",
+          "match": true
+        },
+        "problem": {
+          "discovered": "",
+          "actual": "Not specified in covenant",
+          "match": null
+        },
+        "purpose": {
+          "discovered": "",
+          "actual": "Not specified",
+          "match": null
+        },
+        "maturity": {
+          "discovered": "",
+          "actual": "Not specified",
+          "match": null
+        },
+        "validation": {
+          "discovered": null,
+          "actual": "N/A",
+          "match": null
+        }
+      }
+    },
+    "graph": {
+      "success": true,
+      "discovery": {
+        "service_name": "graph",
+        "problem": {},
+        "idea": {},
+        "validation": {},
+        "maturity_assessment": {},
+        "next_steps": ""
+      },
+      "comparison": {
+        "service_name": {
+          "discovered": "graph",
+          "actual": "graph",
+          "match": true
+        },
+        "problem": {
+          "discovered": "",
+          "actual": "Not specified in covenant",
+          "match": null
+        },
+        "purpose": {
+          "discovered": "",
+          "actual": "Not specified",
+          "match": null
+        },
+        "maturity": {
+          "discovered": "",
+          "actual": "Not specified",
+          "match": null
+        },
+        "validation": {
+          "discovered": null,
+          "actual": "N/A",
+          "match": null
+        }
+      }
+    },
+    "assistant": {
+      "success": true,
+      "discovery": {
+        "service_name": "assistant",
+        "problem": {},
+        "idea": {},
+        "validation": {},
+        "maturity_assessment": {},
+        "next_steps": ""
+      },
+      "comparison": {
+        "service_name": {
+          "discovered": "assistant",
+          "actual": "assistant",
+          "match": true
+        },
+        "problem": {
+          "discovered": "",
+          "actual": "Not specified in covenant",
+          "match": null
+        },
+        "purpose": {
+          "discovered": "",
+          "actual": "Not specified",
+          "match": null
+        },
+        "maturity": {
+          "discovered": "",
+          "actual": "Not specified",
+          "match": null
+        },
+        "validation": {
+          "discovered": null,
+          "actual": "N/A",
+          "match": null
+        }
+      }
+    }
+  }
+}

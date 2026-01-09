@@ -1,58 +1,26 @@
-# Orchestrator Architecture
+# Orchestrator Architecture (Legacy)
 
-**Status**: Draft  
+**Status**: Superseded  
 **Last Updated**: 2026-01-06
 
-## System Overview
+> **Note**: This document has been superseded by comprehensive architecture documentation in `docs/architecture/`.
 
-The Orchestrator is an AI-agent-based orchestration system that replaces solution-engine. Activities are AI agents that use LLM (configurable, OpenAI-compatible API) to make autonomous decisions.
+## New Architecture Documentation
 
-## Core Concepts
+Please see the comprehensive architecture documentation:
 
-### Activities
+- **[Main Architecture](architecture/architecture.md)** - System overview, principles, context
+- **[Component Architecture](architecture/components.md)** - Deep dive into components
+- **[Activity Architecture](architecture/activities.md)** - Activity system design
+- **[Data Architecture](architecture/data.md)** - Data models and flows
+- **[Integration Architecture](architecture/integrations.md)** - External integrations
+- **[Sequence Diagrams](architecture/sequences.md)** - Critical workflows
+- **[Architecture Decision Records](architecture/decisions/)** - Design rationale
+- **[Non-Functional Requirements](architecture/nfr.md)** - Performance, reliability, security
 
-Activities are AI agents that:
-- Use LLM to make decisions (not hardcoded logic)
-- Load context (specification, manifest, tools, history)
-- Format prompts with injected context
-- Call LLM for decision-making
-- Execute playbooks/tools based on LLM decisions
-- Update manifest with results
-- Record history for self-learning
+## Quick Reference
 
-### Specification
+The Orchestrator is an AI-agent-based orchestration system that replaces solution-engine. Activities (AI agents) use LLM to make autonomous decisions, orchestrating playbooks dynamically.
 
-User's goal/requirements (adapted from solution-engine covenant system). Single source of truth for what needs to be built.
-
-### Manifest
-
-Activity execution results (simplified, activity-specific). Records what was actually done.
-
-### Playbook Registry
-
-Registry-driven playbook discovery. `operations/playbooks/playbooks-registry.yaml` is the single source of truth.
-
-## Data Flow
-
-```
-User Input
-    ↓
-Orchestrator.run()
-    ↓
-Activity.execute()
-    ├── Load Context (Specification, Manifest, Tools, History)
-    ├── Format Prompt
-    ├── Call LLM
-    ├── Parse Response
-    ├── Execute Playbooks
-    ├── Update Manifest
-    └── Record History
-```
-
-## Components
-
-See individual documentation:
-- `docs/activities.md` - Activity system
-- `docs/playbooks.md` - Playbook registry
-- `docs/history.md` - Self-learning system
+See [Main Architecture](architecture/architecture.md) for full details.
 

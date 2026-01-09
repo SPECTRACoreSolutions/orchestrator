@@ -7,7 +7,7 @@ from orchestrator.activity import Activity, ActivityContext, ActivityResult
 from orchestrator.llm_client import LLMClient
 
 
-class TestActivity(Activity):
+class Test(Activity):
     """Test activity implementation."""
     
     async def execute(self, context: ActivityContext) -> ActivityResult:
@@ -22,7 +22,7 @@ class TestActivity(Activity):
 @pytest.mark.asyncio
 async def test_activity_initialization():
     """Test Activity initialization."""
-    activity = TestActivity()
+    activity = Test()
     assert activity.name == "test"
     await activity.llm_client.close()
 
@@ -30,7 +30,7 @@ async def test_activity_initialization():
 @pytest.mark.asyncio
 async def test_activity_format_prompt():
     """Test prompt formatting."""
-    activity = TestActivity()
+    activity = Test()
     context = {"test": "value"}
     prompt = activity.format_prompt(context)
     assert "test activity agent" in prompt.lower()
@@ -41,7 +41,7 @@ async def test_activity_format_prompt():
 @pytest.mark.asyncio
 async def test_activity_call_llm_mock(monkeypatch):
     """Test LLM calling with mocked response."""
-    activity = TestActivity()
+    activity = Test()
     
     async def mock_chat_completion(system_prompt, user_message):
         return '{"key": "value"}'

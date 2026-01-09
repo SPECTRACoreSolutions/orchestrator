@@ -1,0 +1,28 @@
+# Semantic Filter Configuration
+# Controls behavior of semantic filtering for prompt optimization
+
+semantic_filter:
+  # Phase 1: LLM filtering (ACTIVE)
+  llm_filtering:
+    enabled: true
+    max_playbooks: 5
+    temperature: 0.3
+    max_tokens: 512
+
+  # Phase 2: Embedding search (ACTIVE)
+  embedding_search:
+    enabled: true  # Set to false to disable and use LLM filtering only
+    model: "all-MiniLM-L6-v2"  # Fast, 384 dims, good accuracy
+    cache_path: ".spectra/embeddings/playbooks.pkl"
+    top_k: 5
+    fallback_to_llm: true  # Fallback to LLM if embeddings fail
+
+  # Phase 3: Tool calling (FUTURE - NOT YET IMPLEMENTED)
+  tool_calling:
+    enabled: false  # Set to true after Phase 3 implementation
+    tools:
+      - get_playbook_content
+      - search_playbooks
+      - list_playbooks
+    max_tool_calls: 3  # Maximum tool calls per activity
+

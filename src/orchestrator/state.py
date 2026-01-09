@@ -67,6 +67,7 @@ class Manifest:
     Records what an activity ACTUALLY did:
     - Outputs created
     - Status, timestamps
+    - Quality gates
     - Complete audit trail
     """
 
@@ -77,6 +78,7 @@ class Manifest:
     status: str = "pending"  # pending, in_progress, complete, failed
     outputs: Dict[str, Any] = field(default_factory=dict)
     errors: List[str] = field(default_factory=list)
+    quality_gates_passed: Dict[str, bool] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def start(self):
@@ -107,6 +109,18 @@ class Manifest:
         """Record an error."""
         self.errors.append(error)
         self.status = "failed"
+    
+    def record_quality_gate(self, gate_name: str, passed: bool):
+        """
+        Record quality gate result.
+        
+        Args:
+            gate_name: Quality gate name
+            passed: Whether the gate passed
+        """
+        if not hasattr(self, "quality_gates_passed"):
+            self.quality_gates_passed = {}
+        self.quality_gates_passed[gate_name] = passed
 
     def to_dict(self) -> Dict:
         """Convert to dictionary."""
@@ -118,6 +132,7 @@ class Manifest:
             "status": self.status,
             "outputs": self.outputs,
             "errors": self.errors,
+            "quality_gates_passed": self.quality_gates_passed,
             **self.metadata,
         }
 
@@ -130,8 +145,16 @@ class Manifest:
     @classmethod
     def load(cls, path: Path) -> "Manifest":
         """Load manifest from YAML file."""
+        if not path.exists():
+            return cls(activity=path.stem.replace("-manifest", ""))
+        
         with open(path) as f:
-            data = yaml.safe_load(f)
+            data = yaml.safe_load(f) or {}
+        
+        # Ensure quality_gates_passed exists (for backwards compatibility)
+        if "quality_gates_passed" not in data:
+            data["quality_gates_passed"] = {}
+        
         return cls(**data)
 
 

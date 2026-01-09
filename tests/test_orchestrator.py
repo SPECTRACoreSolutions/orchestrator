@@ -19,10 +19,10 @@ async def test_orchestrator_initialization():
 async def test_orchestrator_determine_activities():
     """Test activity determination."""
     orchestrator = Orchestrator()
-    
-    activities = orchestrator.determine_activities("discover logging service")
+
+    activities = await orchestrator.determine_activities("discover logging service")
     assert "discover" in activities
-    
+
     await orchestrator.llm_client.close()
 
 
@@ -30,7 +30,7 @@ async def test_orchestrator_determine_activities():
 async def test_orchestrator_run_discover_mock():
     """Test orchestrator run with discover activity (mocked)."""
     orchestrator = Orchestrator()
-    
+
     # Mock discover activity to avoid LLM calls in tests
     async def mock_execute(context):
         from orchestrator.activity import ActivityResult
@@ -40,9 +40,9 @@ async def test_orchestrator_run_discover_mock():
             outputs={"service_name": "test"},
             errors=[],
         )
-    
+
     orchestrator.activities["discover"].execute = mock_execute
-    
+
     try:
         result = await orchestrator.run(
             user_input="discover test service",

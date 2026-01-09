@@ -1,5 +1,8 @@
 # Discover Activity Example
 
+**Activity Name**: `discover`  
+**Class Name**: `Discover`
+
 **Status**: Draft  
 **Last Updated**: 2026-01-06
 
@@ -13,7 +16,7 @@ orchestrator discover "build a logging service for SPECTRA - we need centralized
 
 ## What Happens
 
-1. DiscoverActivity loads context (user input, specification, tools, history)
+1. Discover loads context (user input, specification, tools, history)
 2. Formats prompt with context
 3. Calls LLM for analysis
 4. LLM returns: service_name, problem, idea, maturity_assessment

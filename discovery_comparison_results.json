@@ -1,0 +1,162 @@
+{
+  "portal": {
+    "solution_engine": {
+      "service_name": null,
+      "problem": {},
+      "idea": {},
+      "yin_yang_mapping": {},
+      "maturity_assessment": {},
+      "registry_check": {},
+      "discovery_game": {},
+      "high_level_design": {},
+      "problem_statement": {},
+      "proposed_approach": {},
+      "quality_gates": {},
+      "errors": []
+    },
+    "orchestrator": {
+      "service_name": "portal",
+      "problem": {},
+      "idea": {},
+      "validation": {},
+      "next_steps": "",
+      "quality_gates": {},
+      "errors": []
+    },
+    "comparison": {
+      "service_name": {
+        "solution_engine": null,
+        "orchestrator": "portal",
+        "match": false
+      },
+      "problem": {
+        "solution_engine": "",
+        "orchestrator": "",
+        "similarity": "N/A"
+      },
+      "idea": {
+        "solution_engine": "",
+        "orchestrator": "",
+        "match": true
+      },
+      "maturity_assessment": {
+        "solution_engine": "",
+        "orchestrator": "N/A (moved to Assess activity)",
+        "present_in_orchestrator": false
+      },
+      "registry_check": {
+        "solution_engine": {},
+        "orchestrator": "NOT IMPLEMENTED",
+        "present_in_orchestrator": false
+      },
+      "discovery_game": {
+        "solution_engine": {},
+        "orchestrator": "NOT IMPLEMENTED",
+        "present_in_orchestrator": false
+      },
+      "high_level_design": {
+        "solution_engine": {},
+        "orchestrator": "NOT IMPLEMENTED",
+        "present_in_orchestrator": false
+      },
+      "problem_statement_doc": {
+        "solution_engine": "",
+        "orchestrator": "NOT IMPLEMENTED",
+        "present_in_orchestrator": false
+      },
+      "proposed_approach_doc": {
+        "solution_engine": "",
+        "orchestrator": "NOT IMPLEMENTED",
+        "present_in_orchestrator": false
+      },
+      "validation": {
+        "solution_engine": {},
+        "orchestrator": {},
+        "similarity": "Different structure"
+      },
+      "orchestrator_only": {
+        "next_steps": ""
+      }
+    }
+  },
+  "email": {
+    "solution_engine": {
+      "service_name": null,
+      "problem": {},
+      "idea": {},
+      "yin_yang_mapping": {},
+      "maturity_assessment": {},
+      "registry_check": {},
+      "discovery_game": {},
+      "high_level_design": {},
+      "problem_statement": {},
+      "proposed_approach": {},
+      "quality_gates": {},
+      "errors": []
+    },
+    "orchestrator": {
+      "service_name": "email",
+      "problem": {},
+      "idea": {},
+      "validation": {},
+      "next_steps": "",
+      "quality_gates": {},
+      "errors": []
+    },
+    "comparison": {
+      "service_name": {
+        "solution_engine": null,
+        "orchestrator": "email",
+        "match": false
+      },
+      "problem": {
+        "solution_engine": "",
+        "orchestrator": "",
+        "similarity": "N/A"
+      },
+      "idea": {
+        "solution_engine": "",
+        "orchestrator": "",
+        "match": true
+      },
+      "maturity_assessment": {
+        "solution_engine": "",
+        "orchestrator": "N/A (moved to Assess activity)",
+        "present_in_orchestrator": false
+      },
+      "registry_check": {
+        "solution_engine": {},
+        "orchestrator": "NOT IMPLEMENTED",
+        "present_in_orchestrator": false
+      },
+      "discovery_game": {
+        "solution_engine": {},
+        "orchestrator": "NOT IMPLEMENTED",
+        "present_in_orchestrator": false
+      },
+      "high_level_design": {
+        "solution_engine": {},
+        "orchestrator": "NOT IMPLEMENTED",
+        "present_in_orchestrator": false
+      },
+      "problem_statement_doc": {
+        "solution_engine": "",
+        "orchestrator": "NOT IMPLEMENTED",
+        "present_in_orchestrator": false
+      },
+      "proposed_approach_doc": {
+        "solution_engine": "",
+        "orchestrator": "NOT IMPLEMENTED",
+        "present_in_orchestrator": false
+      },
+      "validation": {
+        "solution_engine": {},
+        "orchestrator": {},
+        "similarity": "Different structure"
+      },
+      "orchestrator_only": {
+        "next_steps": ""
+      }
+    }
+  }
+}
