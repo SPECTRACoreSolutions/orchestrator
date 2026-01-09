@@ -53,6 +53,7 @@ class LLMClient:
         user_message: str,
         max_tokens: int = 1024,
         temperature: float = 0.3,
+        response_format: Optional[dict] = None,
     ) -> str:
         """
         Send chat completion request to LLM.
@@ -84,6 +85,10 @@ class LLMClient:
             "max_tokens": max_tokens,
             "temperature": temperature,
         }
+        
+        # Add response_format if provided (OpenAI API supports this)
+        if response_format:
+            payload["response_format"] = response_format
 
         # #region agent log
         import json as json_module

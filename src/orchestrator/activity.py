@@ -124,7 +124,13 @@ class Activity(ABC):
 
         return "\n".join(prompt_parts)
 
-    async def call_llm(self, system_prompt: str, user_message: str, max_tokens: int = 512) -> Dict:
+    async def call_llm(
+        self, 
+        system_prompt: str, 
+        user_message: str, 
+        max_tokens: int = 512,
+        response_format: Optional[dict] = None,
+    ) -> Dict:
         """
         Call LLM and parse JSON response.
 
@@ -139,7 +145,12 @@ class Activity(ABC):
         Raises:
             ValueError: If response cannot be parsed as JSON
         """
-        response = await self.llm_client.chat_completion(system_prompt, user_message, max_tokens=max_tokens)
+        response = await self.llm_client.chat_completion(
+            system_prompt, 
+            user_message, 
+            max_tokens=max_tokens,
+            response_format=response_format,
+        )
 
         # #region agent log
         import json as json_module
@@ -172,23 +183,65 @@ class Activity(ABC):
         # Try to parse JSON from response
         try:
             # Extract JSON from markdown code blocks if present
-            json_content = response
-            if "```json" in response:
-                json_start = response.find("```json") + 7
-                json_end = response.find("```", json_start)
-                json_content = response[json_start:json_end].strip()
-            elif "```" in response:
-                json_start = response.find("```") + 3
-                json_end = response.find("```", json_start)
+            json_content = response.strip()
+            
+            # First, try to extract from markdown fences (handle explanatory text before fences)
+            if "```json" in json_content:
+                # Find all occurrences of ```json
+                json_start = json_content.find("```json")
+                # Skip past the fence marker
+                json_start = json_content.find("\n", json_start) + 1
+                # Find the closing fence
+                json_end = json_content.find("```", json_start)
                 if json_end > json_start:
-                    json_content = response[json_start:json_end].strip()
+                    json_content = json_content[json_start:json_end].strip()
+                else:
+                    # No closing fence, take everything after ```json
+                    json_content = json_content[json_start:].strip()
+            elif "```" in json_content:
+                # Handle generic code fences (might be ```python or just ```)
+                json_start = json_content.find("```")
+                # Check if it's a language-specific fence
+                fence_end_marker = json_content.find("\n", json_start)
+                if fence_end_marker > json_start:
+                    json_start = fence_end_marker + 1
+                else:
+                    json_start = json_start + 3
+                # Find closing fence
+                json_end = json_content.find("```", json_start)
+                if json_end > json_start:
+                    json_content = json_content[json_start:json_end].strip()
+                else:
+                    json_content = json_content[json_start:].strip()
 
-            # Try to find JSON object if not in code block
+            # Remove any explanatory text before the first {
+            # Handle cases like "Here is the JSON:\n\n{...}" or "Response:\n{...}"
             if not json_content.strip().startswith("{"):
                 start_brace = json_content.find("{")
-                end_brace = json_content.rfind("}")
-                if start_brace >= 0 and end_brace > start_brace:
-                    json_content = json_content[start_brace:end_brace + 1]
+                if start_brace >= 0:
+                    # Remove everything before the first {
+                    json_content = json_content[start_brace:]
+                else:
+                    # No { found, try to find JSON array
+                    start_bracket = json_content.find("[")
+                    if start_bracket >= 0:
+                        json_content = json_content[start_bracket:]
+            
+            # Find the last complete JSON object (handle trailing text)
+            if json_content.strip().startswith("{"):
+                # Find the matching closing brace
+                brace_count = 0
+                end_pos = -1
+                for i, char in enumerate(json_content):
+                    if char == '{':
+                        brace_count += 1
+                    elif char == '}':
+                        brace_count -= 1
+                        if brace_count == 0:
+                            end_pos = i
+                            break
+                if end_pos > 0:
+                    json_content = json_content[:end_pos + 1]
 
             # Fix common JSON issues before parsing
             import re

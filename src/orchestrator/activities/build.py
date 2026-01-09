@@ -263,9 +263,21 @@ SPECTRA STANDARDS:
 - Python/PySpark: Mandatory default language
 - Code quality: Linting must pass, zero errors
 
-Respond in JSON format with:
-- code_structure: {{"directories": [], "file_categories": {{"critical": [], "normal": [], "low": []}}}}
-- files_to_create: [
+CRITICAL: Respond with ONLY raw JSON. No markdown fences (```json), no explanation text, 
+no preamble, no "Here is the JSON:" text. Start your response with {{ and end with }}. 
+Pure JSON only - nothing else.
+
+Expected JSON format:
+{{
+  "code_structure": {{
+    "directories": [],
+    "file_categories": {{
+      "critical": [],
+      "normal": [],
+      "low": []
+    }}
+  }},
+  "files_to_create": [
     {{
       "path": "src/main.py",
       "type": "source",
@@ -274,18 +286,50 @@ Respond in JSON format with:
       "dependencies": ["fastapi", "pydantic"],
       "estimated_lines": 150
     }}
-  ]
-- build_commands: [{{"command": str, "description": str}}]
-- build_results: {{"build_successful": bool, "artifacts": [], "errors": []}}
-- validation: {{"structure_complete": bool, "build_passed": bool, "linting_passed": bool}}
+  ],
+  "build_commands": [{{"command": str, "description": str}}],
+  "build_results": {{
+    "build_successful": bool,
+    "artifacts": [],
+    "errors": []
+  }},
+  "validation": {{
+    "structure_complete": bool,
+    "build_passed": bool,
+    "linting_passed": bool
+  }}
+}}
 
-IMPORTANT: Categorize files accurately - critical files will get full LLM generation!
+IMPORTANT: 
+- Categorize files accurately - critical files will get full LLM generation!
+- Your response must be ONLY the JSON object above, nothing else!
 """
 
         try:
             # Call LLM for code generation and building
             logger.debug("Calling LLM for code generation and build analysis...")
-            llm_response = await self.call_llm(system_prompt, user_message, max_tokens=4096)
+            # Use OpenAI response_format if available (forces JSON output)
+            # Check if we're using OpenAI API (contains "api.openai.com" or model starts with "gpt")
+            import os
+            api_url_lower = self.llm_client.api_url.lower()
+            model_lower = self.llm_client.model.lower()
+            is_openai = (
+                "api.openai.com" in api_url_lower
+                or "openai" in api_url_lower
+                or model_lower.startswith("gpt")
+                or "gpt-" in model_lower
+                or "gpt4" in model_lower
+            )
+            response_format = None
+            if is_openai:
+                response_format = {"type": "json_object"}
+                logger.debug("Using OpenAI response_format to enforce JSON output")
+            llm_response = await self.call_llm(
+                system_prompt, 
+                user_message, 
+                max_tokens=4096,
+                response_format=response_format,
+            )
 
             # Extract build results
             code_structure = llm_response.get("code_structure", {})
